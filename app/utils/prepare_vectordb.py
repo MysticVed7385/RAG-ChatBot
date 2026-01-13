@@ -33,7 +33,7 @@ def get_text_chunks(docs):
     - chunks: List of text chunks
     """
     # Chunk size is configured to be an approximation to the model limit of 2048 tokens
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=8000, chunk_overlap=800, separators=["\n\n", "\n", " ", ""])
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150, separators=["\n\n", "\n", " ", ""])
     chunks = text_splitter.split_documents(docs)
     return chunks
 
@@ -48,8 +48,10 @@ def get_vectorstore(pdfs, from_session_state=False):
     Returns:
     - vectordb or None: The created or retrieved vectorstore. Returns None if loading from session state and the database does not exist
     """
-    load_dotenv()
-    embedding = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+    embedding = GoogleGenerativeAIEmbeddings(
+    model="models/embedding-001",
+    google_api_key=os.getenv("GOOGLE_API_KEY")
+)
     if from_session_state and os.path.exists("Vector_DB - Documents"):
         # Retrieve vectorstore from existing one
         vectordb = Chroma(persist_directory="Vector_DB - Documents", embedding_function=embedding)
